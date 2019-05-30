@@ -15,6 +15,7 @@ View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 from maze_env import Maze
 from RL_brain import QLearningTable
 
+#test!!!
 
 def update():
     for episode in range(100):
