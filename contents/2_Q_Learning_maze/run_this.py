@@ -29,6 +29,7 @@ def update():
             #print(str(observation))
 
             # RL choose action based on observation
+            #迷宫游戏的state是一个list,表示探索者的位置
             action = RL.choose_action(str(observation))
 
             # RL take action and get next observation and reward
