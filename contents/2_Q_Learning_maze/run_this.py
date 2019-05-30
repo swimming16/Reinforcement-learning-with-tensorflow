@@ -21,10 +21,12 @@ def update():
     for episode in range(100):
         # initial observation
         observation = env.reset()
+        print('q_table\n',RL.q_table)
 
         while True:
             # fresh env
             env.render()
+            #print(str(observation))
 
             # RL choose action based on observation
             action = RL.choose_action(str(observation))
@@ -48,7 +50,10 @@ def update():
 
 if __name__ == "__main__":
     env = Maze()
+    print(list(range(env.n_actions)))
+
     RL = QLearningTable(actions=list(range(env.n_actions)))
+    #print('q_table',RL.q_table)
 
     env.after(100, update)
     env.mainloop()
