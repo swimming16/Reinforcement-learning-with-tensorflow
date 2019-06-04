@@ -29,7 +29,7 @@ class DeepQNetwork:
             e_greedy=0.9,
             replace_target_iter=300,
             memory_size=500,
-            batch_size=32,
+            batch_size=32, # 每次更新时从 memory 里面取多少记忆出来
             e_greedy_increment=None,
             output_graph=False,
     ):
@@ -159,6 +159,9 @@ class DeepQNetwork:
         q_target = q_eval.copy()
 
         batch_index = np.arange(self.batch_size, dtype=np.int32)
+        print('index',batch_memory[:,self.n_features])
+
+        # eval_act_index记录每条memory中的变化action的索引位置，memory中每一行中的第feature本来就是表示action的位置
         eval_act_index = batch_memory[:, self.n_features].astype(int)
         reward = batch_memory[:, self.n_features + 1]
 

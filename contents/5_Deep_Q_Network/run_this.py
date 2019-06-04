@@ -43,8 +43,8 @@ if __name__ == "__main__":
                       learning_rate=0.01,
                       reward_decay=0.9,
                       e_greedy=0.9,
-                      replace_target_iter=200,
-                      memory_size=2000,
+                      replace_target_iter=200,    # 每 200 步替换一次 target_net 的参数
+                      memory_size=2000,           # 记忆上限
                       # output_graph=True
                       )
     env.after(100, run_maze)
