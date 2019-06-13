@@ -28,8 +28,8 @@ class DeepQNetwork:
             reward_decay=0.9,
             e_greedy=0.9,
             replace_target_iter=300,
-            memory_size=500,  #memory的数据类型是[s,a,r,s_]，batch的数据类型一样
-            batch_size=32, # 每次更新时从 memory 里面取多少记忆出来
+            memory_size=500,  #memory的数据类型是[s,a,r,s_]，神经网络的参数根据memory中的数据进行更新
+            batch_size=32, # 每次更新时从 memory中抽出bstch大小的数据用来更新神经网络
             e_greedy_increment=None,
             output_graph=True,
     ):
@@ -151,6 +151,8 @@ class DeepQNetwork:
         q_next, q_eval = self.sess.run(
             [self.q_next, self.q_eval],
             feed_dict={
+                #batch的前两列是s,将s的数据喂给q_eval的神经网络
+                #batch的后两列是s_,将s_的数据喂给q_next的神经网络
                 self.s_: batch_memory[:, -self.n_features:],  # fixed params
                 self.s: batch_memory[:, :self.n_features],  # newest params
             })
@@ -161,10 +163,11 @@ class DeepQNetwork:
         batch_index = np.arange(self.batch_size, dtype=np.int32)
         print('index',batch_memory[:,self.n_features])
 
-        # eval_act_index记录每条memory中的变化action的索引位置，memory中每一行中的第feature列本来就是表示action的位置
+        # eval_act_index记录每条memory中的变化action的索引位置，memory中每一行中的第feature列本来就是表示采用了哪个action
         eval_act_index = batch_memory[:, self.n_features].astype(int)
         reward = batch_memory[:, self.n_features + 1]
 
+        #更新batch中每个q_target的值
         q_target[batch_index, eval_act_index] = reward + self.gamma * np.max(q_next, axis=1)
 
         """
@@ -193,9 +196,10 @@ class DeepQNetwork:
         leave other action as error=0 cause we didn't choose it.
         """
 
-        # train eval network
+        # train eval network,
+        #loss=q_eval-q_target,目标是使得loss最小,即两者越接近越好
         _, self.cost = self.sess.run([self._train_op, self.loss],
-                                     feed_dict={self.s: batch_memory[:, :self.n_features],
+                                     feed_dict={self.s: batch_memory[:, :self.n_features],#batch中所有行的前两列喂给s
                                                 self.q_target: q_target})
         self.cost_his.append(self.cost)
 
