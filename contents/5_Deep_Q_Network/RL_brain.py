@@ -28,10 +28,10 @@ class DeepQNetwork:
             reward_decay=0.9,
             e_greedy=0.9,
             replace_target_iter=300,
-            memory_size=500,
+            memory_size=500,  #memory的数据类型是[s,a,r,s_]，batch的数据类型一样
             batch_size=32, # 每次更新时从 memory 里面取多少记忆出来
             e_greedy_increment=None,
-            output_graph=False,
+            output_graph=True,
     ):
         self.n_actions = n_actions
         self.n_features = n_features
@@ -129,8 +129,8 @@ class DeepQNetwork:
 
         if np.random.uniform() < self.epsilon:
             # forward feed the observation and get q value for every actions
-            actions_value = self.sess.run(self.q_eval, feed_dict={self.s: observation})
-            action = np.argmax(actions_value)
+            actions_value = self.sess.run(self.q_eval, feed_dict={self.s: observation}) #q_eval就是action的值
+            action = np.argmax(actions_value)   #根据选取至最大的action
         else:
             action = np.random.randint(0, self.n_actions)
         return action
@@ -161,7 +161,7 @@ class DeepQNetwork:
         batch_index = np.arange(self.batch_size, dtype=np.int32)
         print('index',batch_memory[:,self.n_features])
 
-        # eval_act_index记录每条memory中的变化action的索引位置，memory中每一行中的第feature本来就是表示action的位置
+        # eval_act_index记录每条memory中的变化action的索引位置，memory中每一行中的第feature列本来就是表示action的位置
         eval_act_index = batch_memory[:, self.n_features].astype(int)
         reward = batch_memory[:, self.n_features + 1]
 
